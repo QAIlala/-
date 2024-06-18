@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.help_farmers.mapper.JxcWarehouseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.help_farmers.model.domain.JxcWarehouse">
+        <id column="w_id" property="wId" />
+        <result column="w_code" property="wCode" />
+        <result column="w_name" property="wName" />
+        <result column="w_contact" property="wContact" />
+        <result column="w_phone" property="wPhone" />
+        <result column="w_address" property="wAddress" />
+        <result column="w_postcode" property="wPostcode" />
+        <result column="w_created_time" property="wCreatedTime" />
+        <result column="w_used_time" property="wUsedTime" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        w_id, w_code, w_name, w_contact, w_phone, w_address, w_postcode, w_created_time, w_used_time, create_time, create_by, update_time, update_by, del_flag
+    </sql>
+
+</mapper>

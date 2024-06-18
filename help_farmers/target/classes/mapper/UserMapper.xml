@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.help_farmers.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.help_farmers.model.domain.User">
+        <id column="id" property="id" />
+        <result column="user_name" property="userName" />
+        <result column="password" property="password" />
+        <result column="true_name" property="trueName" />
+        <result column="phone" property="phone" />
+        <result column="address" property="address" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="remarks" property="remarks" />
+        <result column="ban_flag" property="banFlag" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_name, password, true_name, phone, address, create_by, create_time, remarks, ban_flag, del_flag
+    </sql>
+
+    <select id="userList" resultType="com.help_farmers.model.vo.UserVo">
+        SELECT
+        u.id,
+        u.user_name,
+        u.true_name,
+        u.phone,
+        u.address,
+        u.remarks,
+        u.create_by,
+        u.create_time,
+        u.ban_flag,
+        r.id AS roleId,
+        r.name AS roleName
+        FROM
+        t_user u
+        LEFT JOIN t_user_role ur ON ur.user_id = u.id
+        LEFT JOIN t_role r ON ur.role_id = r.id
+        <where>
+            <if test="1 == 1">
+                u.del_flag = 0
+            </if>
+            <if test="userName != null and userName != ''">
+                AND u.user_name like concat('%', #{userName},'%')
+            </if>
+            <if test="trueName != null and trueName != ''">
+                AND u.true_name like concat('%', #{trueName},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND u.phone like concat('%', #{phone},'%')
+            </if>
+            <if test="roleId != null and roleId != ''">
+                AND r.id = #{roleId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

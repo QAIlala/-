@@ -1,0 +1,48 @@
+server:
+  port: 10001
+  servlet:
+    context-path: /
+
+# 数据源
+spring:
+  datasource:
+      druid:
+        url:  jdbc:mysql://localhost:3306/helpfarmers?useUnicode=true&characterEncoding=utf-8&useSSL=false
+        driver-class-name:  com.mysql.jdbc.Driver
+        username:  root
+        password:  123456
+        initial-size:  10
+        max-active:  50
+        min-idle:  10
+        max-wait:  60000
+        pool-prepared-statements:  true
+        max-pool-prepared-statement-per-connection-size:  20
+        validation-query:  SELECT 1 FROM DUAL
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    #    password: 123456 #默认为空
+    lettuce:
+      pool:
+        max-active: 20  #最大连接数，负值表示没有限制，默认8
+        max-wait: -1    #最大阻塞等待时间，负值表示没限制，默认-1
+        max-idle: 8     #最大空闲连接，默认8
+        min-idle: 0     #最小空闲连接，默认0
+
+## Mybatis-plus配置
+mybatis-plus:
+  #配置Mapper映射文件
+  mapper-locations: classpath*:/mapper/*Mapper.xml
+  #配置Mybatis数据返回类型别名（默认别名是类名）
+  type-aliases-package: com.help_farmers.domain
+  configuration:
+    # 自动驼峰命名
+    map-underscore-to-camel-case: true
+
+# 打印sqk
+logging:
+  level:
+    com.help_farmers.mapper: debug
+

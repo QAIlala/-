@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.help_farmers.mapper.MenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.help_farmers.model.domain.Menu">
+        <id column="id" property="id" />
+        <result column="icon" property="icon" />
+        <result column="name" property="name" />
+        <result column="state" property="state" />
+        <result column="url" property="url" />
+        <result column="p_id" property="pId" />
+        <result column="acl_value" property="aclValue" />
+        <result column="grade" property="grade" />
+        <result column="ban_flag" property="banFlag" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, icon, name, state, url, p_id, acl_value, grade, ban_flag, del_flag
+    </sql>
+    <select id="queryAllMenus" resultType="com.help_farmers.model.dto.TreeDto">
+        select id, p_id as pId, name
+        from t_menu
+        where ban_flag = 0 AND del_flag = 0
+    </select>
+
+    <select id="getMenus" resultType="com.help_farmers.model.vo.MenuVo">
+        select m.id, m.icon, m.name, m.url, m.p_id, m.state
+        from t_role_menu rm
+        LEFT JOIN t_menu m ON rm.menu_id = m.id
+        where m.ban_flag = 0
+          AND m.del_flag = 0
+          AND rm.role_id = #{roleId}
+    </select>
+
+</mapper>

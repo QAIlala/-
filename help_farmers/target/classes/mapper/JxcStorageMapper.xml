@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.help_farmers.mapper.JxcStorageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.help_farmers.model.domain.JxcStorage">
+        <id column="id" property="id" />
+        <result column="farm_products_number" property="farmProductsNumber" />
+        <result column="batch_num" property="batchNum" />
+        <result column="s_num" property="sNum" />
+        <result column="s_total_price" property="sTotalPrice" />
+        <result column="w_id" property="wId" />
+        <result column="s_people" property="sPeople" />
+        <result column="s_phone" property="sPhone" />
+        <result column="remarks" property="remarks" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, farm_products_number, batch_num, s_num, s_total_price, w_id, s_people, s_phone, remarks, create_time, create_by, del_flag
+    </sql>
+
+    <select id="storageList" resultType="com.help_farmers.model.vo.StorageVo">
+        SELECT
+            js.id,
+            js.farm_products_number,
+            fp.name AS farmProductsName,
+            js.batch_num,
+            jw.w_name AS wName,
+            fp.unit,
+            fp.in_price AS inPrice,
+            js.s_num,
+            js.s_total_price,
+            js.s_people,
+            js.s_phone,
+            js.remarks,
+            js.create_time,
+            js.create_by
+        FROM
+            t_jxc_storage js
+                LEFT JOIN t_base_farm_products fp ON js.farm_products_number = fp.number
+                LEFT JOIN t_jxc_warehouse jw ON js.w_id = jw.w_id
+        <where>
+            <if test="1 == 1">
+                js.del_flag = 0
+            </if>
+            <if test="farmProductsNumber != null and farmProductsNumber != ''">
+                AND js.farm_products_number like concat('%', #{farmProductsNumber},'%')
+            </if>
+            <if test="farmProductsName != null and farmProductsName != ''">
+                AND fp.name like concat('%', #{farmProductsName},'%')
+            </if>
+        </where>
+        ORDER BY
+            js.create_time DESC
+    </select>
+
+</mapper>

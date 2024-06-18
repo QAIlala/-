@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.help_farmers.mapper.OrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.help_farmers.model.domain.Order">
+        <id column="id" property="id" />
+        <result column="number" property="number" />
+        <result column="status" property="status" />
+        <result column="user_id" property="userId" />
+        <result column="order_time" property="orderTime" />
+        <result column="pay_time" property="payTime" />
+        <result column="pay_status" property="payStatus" />
+        <result column="amount" property="amount" />
+        <result column="remarks" property="remarks" />
+        <result column="phone" property="phone" />
+        <result column="consignee" property="consignee" />
+        <result column="address" property="address" />
+        <result column="cancel_reason" property="cancelReason" />
+        <result column="rejection_reason" property="rejectionReason" />
+        <result column="cancel_time" property="cancelTime" />
+        <result column="refund_reason" property="refundReason" />
+        <result column="back_reason" property="backReason" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, number, status, user_id, order_time, pay_time, pay_status, amount, remarks, phone, consignee, address, cancel_reason, rejection_reason, cancel_time, refund_reason, back_reason, del_flag
+    </sql>
+
+    <select id="orderList" resultType="com.help_farmers.model.domain.Order">
+        SELECT
+            o.id,
+            o.number,
+            o.STATUS,
+            o.user_id,
+            o.order_time,
+            o.pay_time,
+            o.pay_status,
+            o.amount,
+            o.remarks,
+            o.phone,
+            o.consignee,
+            o.address,
+            o.cancel_reason,
+            o.rejection_reason,
+            o.cancel_time,
+            o.refund_reason,
+            o.back_reason
+        FROM
+            t_order o
+        <where>
+            <if test="1 == 1">
+                o.del_flag = 0 AND o.user_id = #{userId}
+            </if>
+            <if test="number != null and number != ''">
+                AND o.number like concat('%', #{number},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND o.phone like concat('%', #{phone},'%')
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND o.order_time &gt;= CAST(#{beginTime} AS DATETIME)
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND o.order_time &lt;= CAST(#{endTime} AS DATETIME)
+            </if>
+        </where>
+        ORDER BY
+        o.order_time DESC
+    </select>
+
+    <select id="orderList2" resultType="com.help_farmers.model.domain.Order">
+        SELECT
+        o.id,
+        o.number,
+        o.STATUS,
+        o.user_id,
+        o.order_time,
+        o.pay_time,
+        o.pay_status,
+        o.amount,
+        o.remarks,
+        o.phone,
+        o.consignee,
+        o.address,
+        o.cancel_reason,
+        o.rejection_reason,
+        o.cancel_time,
+        o.refund_reason,
+        o.back_reason
+        FROM
+        t_order o
+        <where>
+            <if test="1 == 1">
+                o.del_flag = 0 AND o.status IN
+                <foreach collection="status" item="statusOne" open="(" separator="," close=")">
+                    #{statusOne}
+                </foreach>
+            </if>
+            <if test="number != null and number != ''">
+                AND o.number like concat('%', #{number},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND o.phone like concat('%', #{phone},'%')
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND o.order_time &gt;= CAST(#{beginTime} AS DATETIME)
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND o.order_time &lt;= CAST(#{endTime} AS DATETIME)
+            </if>
+        </where>
+        ORDER BY
+        o.order_time DESC
+    </select>
+
+    <select id="getMonthSales" resultType="com.help_farmers.model.dto.SalesDTO">
+        SELECT
+            od.farm_products_name,
+            od.number
+        FROM
+            t_order o
+                LEFT JOIN t_order_detail od ON o.id = od.order_id
+        WHERE
+            o.del_flag = '0'
+          AND od.del_flag = '0'
+          AND o.pay_status = '1'
+          AND DATE_FORMAT( o.order_time, '%Y%m' ) = DATE_FORMAT( CURDATE(), '%Y%m' )
+    </select>
+
+    <select id="getWeekOrderNumber" resultType="com.help_farmers.model.dto.OrderNumberDto">
+        SELECT
+            b.count AS value,
+            @rownum := @rownum + 1 AS name
+        FROM
+            (
+            SELECT
+            a.weekday,
+            COUNT( o.id ) count
+            FROM
+            (
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 0 DAY ) AS weekday UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 1 DAY ) UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 2 DAY ) UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 3 DAY ) UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 4 DAY ) UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 5 DAY ) UNION
+            SELECT
+            date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - 6 DAY )
+            ) AS a
+            LEFT JOIN t_order AS o ON date_format( o.order_time, '%Y-%m-%d' ) = a.weekday
+            AND o.del_flag = '0'
+            AND o.pay_status = '1'
+            GROUP BY
+            a.weekday
+            ) b,
+            ( SELECT @rownum := 0 ) r
+    </select>
+
+    <select id="getWeekProfit" resultType="com.help_farmers.model.dto.ProfitDto">
+        SELECT
+            (#{weekday} + 1) AS weekday,
+            od.profit
+        FROM
+            t_order o
+                LEFT JOIN t_order_detail od ON o.id = od.order_id
+        WHERE
+            o.del_flag = '0'
+          AND od.del_flag = '0'
+          AND o.pay_status = '1'
+          AND
+            DATE_FORMAT( o.order_time, '%Y-%m-%d' ) = date_sub( curdate( ), INTERVAL WEEKDAY( curdate( ) ) - #{weekday} DAY )
+    </select>
+
+</mapper>
